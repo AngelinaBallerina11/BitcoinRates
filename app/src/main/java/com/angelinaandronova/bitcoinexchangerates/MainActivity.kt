@@ -34,13 +34,14 @@ class MainActivity : AppCompatActivity() {
         viewModel.chartEntries.observe(this, Observer { data ->
             data?.let {
                 Log.i("ANGELINA1234", "data $it")
-                setUpChart(it)
+                setUpChart(it.second)
                 popProgress()
             }
         })
 
         viewModel.timespan.observe(this, Observer {
             Log.i("ANGELINA1234", "timespan $it")
+            if (it == viewModel.chartEntries.value?.first) return@Observer
             pushProgress()
             viewModel.loadData(it)
             when (it) {
@@ -61,8 +62,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-
-        viewModel.state
 
         btDay.setOnClickListener { viewModel.timespan.value = DAY }
         btWeek.setOnClickListener { viewModel.timespan.value = WEEK }

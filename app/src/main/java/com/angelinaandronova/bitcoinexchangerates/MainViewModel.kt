@@ -9,9 +9,8 @@ import kotlinx.coroutines.*
 
 class MainViewModel : ViewModel(), CoroutineScope by MainScope() {
 
-    val chartEntries: MutableLiveData<ArrayList<Entry>> = MutableLiveData()
+    val chartEntries: MutableLiveData<Pair<TimeSpan, ArrayList<Entry>>> = MutableLiveData()
     var timespan: MutableLiveData<TimeSpan> = MutableLiveData<TimeSpan>().default(TimeSpan.WEEK)
-    val state: Pair<MutableLiveData<TimeSpan>, MutableLiveData<ArrayList<Entry>>> = Pair(timespan, chartEntries)
 
     fun loadData(timespan: TimeSpan) {
         launch {
@@ -23,7 +22,7 @@ class MainViewModel : ViewModel(), CoroutineScope by MainScope() {
 
             val entries = arrayListOf<Entry>()
             response.body()?.values?.forEach { entries.add(Entry(it.x, it.y)) }
-            chartEntries.value = entries
+            chartEntries.value = Pair(timespan, entries)
         }
     }
 
