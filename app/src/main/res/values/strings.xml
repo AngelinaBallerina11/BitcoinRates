@@ -4,4 +4,6 @@
     <string name="year">Year</string>
     <string name="week">Week</string>
     <string name="day">Day</string>
+    <string name="you_are_not_connected_to_the_internet">You are not connected to the internet</string>
+    <string name="retry">RETRY</string>
 </resources>

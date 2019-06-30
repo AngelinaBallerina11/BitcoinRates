@@ -7,6 +7,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.angelinaandronova.bitcoinexchangerates.MainViewModel.ScreenState.*
 import com.angelinaandronova.bitcoinexchangerates.MainViewModel.TimeSpan.*
 import com.angelinaandronova.bitcoinexchangerates.chartUi.BitcoinMarkerView
 import com.github.mikephil.charting.animation.Easing
@@ -31,53 +32,55 @@ class MainActivity : AppCompatActivity() {
         pushProgress()
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        viewModel.chartEntries.observe(this, Observer { data ->
-            data?.let {
-                Log.i("ANGELINA1234", "data $it")
-                setUpChart(it.second)
-                popProgress()
-            }
-        })
-
-        viewModel.timespan.observe(this, Observer {
-            Log.i("ANGELINA1234", "timespan $it")
-            if (it == viewModel.chartEntries.value?.first) return@Observer
-            pushProgress()
-            viewModel.loadData(it)
+        viewModel.screenState.observe(this, Observer {
             when (it) {
-                DAY -> {
-                    btDay.select()
-                    btWeek.unselect()
-                    btYear.unselect()
+                is NoConnection -> {
+                    displayNoConnectionMessage()
+                    Log.i("ANGELINA1234", "no connection")
                 }
-                WEEK -> {
-                    btWeek.select()
-                    btDay.unselect()
-                    btYear.unselect()
+                is Loading -> {
+                    pushProgress()
+                    viewModel.loadData(it.timespan)
+                    Log.i("ANGELINA1234", "loading")
                 }
-                YEAR -> {
-                    btYear.select()
-                    btWeek.unselect()
-                    btDay.unselect()
+                is DisplayData -> {
+                    popProgress()
+                    displayMainContent()
+                    Log.i("ANGELINA1234", "display data")
+                    setUpChart(it.chartEntries)
+                    setUpButtons(it.chartEntries.first)
                 }
             }
         })
 
-        btDay.setOnClickListener { viewModel.timespan.value = DAY }
-        btWeek.setOnClickListener { viewModel.timespan.value = WEEK }
-        btYear.setOnClickListener { viewModel.timespan.value = YEAR }
+        btDay.setOnClickListener { viewModel.screenState.value = Loading(DAY) }
+        btWeek.setOnClickListener { viewModel.screenState.value = Loading(WEEK) }
+        btYear.setOnClickListener { viewModel.screenState.value = Loading(YEAR) }
+        btRetry.setOnClickListener { viewModel.tryToLoadData() }
     }
 
-    private fun Button.unselect() {
-        this.setTextColor(getColorFromAttr(R.attr.unselectedButtonText))
+    private fun setUpButtons(timeSpan: MainViewModel.TimeSpan) {
+        when (timeSpan) {
+            DAY -> {
+                btDay.select()
+                btWeek.unselect()
+                btYear.unselect()
+            }
+            WEEK -> {
+                btWeek.select()
+                btDay.unselect()
+                btYear.unselect()
+            }
+            YEAR -> {
+                btYear.select()
+                btWeek.unselect()
+                btDay.unselect()
+            }
+        }
     }
 
-    private fun Button.select() {
-        this.setTextColor(getColorFromAttr(R.attr.selectedButtonText))
-    }
-
-    private fun setUpChart(chartEntries: ArrayList<Entry>) {
-        val dataSet = LineDataSet(chartEntries, "Bitcoin exchange rates").apply {
+    private fun setUpChart(chartEntries: Pair<MainViewModel.TimeSpan, ArrayList<Entry>>) {
+        val dataSet = LineDataSet(chartEntries.second, "Bitcoin exchange rates").apply {
             color = getColorFromAttr(R.attr.chartLineColor)
             setDrawCircles(false)
             mode = LineDataSet.Mode.CUBIC_BEZIER
@@ -86,11 +89,10 @@ class MainActivity : AppCompatActivity() {
 
         val xAxisFormatter = object : ValueFormatter() {
             override fun getAxisLabel(value: Float, axis: AxisBase?): String =
-                when (viewModel.timespan.value) {
+                when (chartEntries.first) {
                     DAY -> formatForDay(value)
                     WEEK -> formatForWeek(value)
                     YEAR -> formatForYear(value)
-                    else -> formatForWeek(value)
                 }
 
         }
@@ -99,11 +101,10 @@ class MainActivity : AppCompatActivity() {
             data = LineData(dataSet)
             xAxis.run {
                 valueFormatter = xAxisFormatter
-                granularity = when (viewModel.timespan.value) {
+                granularity = when (chartEntries.first) {
                     DAY -> HOUR_IN_SECONDS
                     WEEK -> DAY_IN_SECONDS
                     YEAR -> MONTH_IN_SECONDS
-                    else -> DAY_IN_SECONDS
                 }
             }
             markerView = BitcoinMarkerView(context, R.layout.chart_marker_view)
@@ -114,29 +115,65 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun formatForDay(value: Float): String {
-        val fmt = DateTimeFormat.forPattern("HH:mm")
-        return fmt.print(DateTime(value.toLong() * SEC_TO_MILLIS, DateTimeZone.UTC))
-    }
+    private fun formatForDay(value: Float) = getFormatter(value, DAY_FORMAT)
 
-    private fun formatForWeek(value: Float): String {
-        val fmt = DateTimeFormat.forPattern("MMM dd")
-        return fmt.print(DateTime(value.toLong() * SEC_TO_MILLIS, DateTimeZone.UTC))
-    }
+    private fun formatForWeek(value: Float) = getFormatter(value, WEEK_FORMAT)
 
-    private fun formatForYear(value: Float): String {
-        val fmt = DateTimeFormat.forPattern("MMM YYYY")
-        return fmt.print(DateTime(value.toLong() * SEC_TO_MILLIS, DateTimeZone.UTC))
+    private fun formatForYear(value: Float) = getFormatter(value, YEAR_FORMAT)
+
+    private fun getFormatter(value: Float, pattern: String = WEEK_FORMAT) = DateTimeFormat.forPattern(pattern).run {
+        print(DateTime(value.toLong() * SEC_TO_MILLIS, DateTimeZone.UTC))
     }
 
     private fun pushProgress() {
-        lineChart.visibility = View.INVISIBLE
+        mainContent.visibility = View.INVISIBLE
         progressBar.visibility = View.VISIBLE
+        btRetry.visibility = View.INVISIBLE
+        tvNoConnection.visibility = View.INVISIBLE
     }
 
     private fun popProgress() {
-        lineChart.visibility = View.VISIBLE
+        mainContent.visibility = View.VISIBLE
         progressBar.visibility = View.INVISIBLE
+        btRetry.visibility = View.INVISIBLE
+        tvNoConnection.visibility = View.INVISIBLE
+    }
+
+    /**
+     * Show "No Connection" UI and hide the chart, timespan buttons & progress bar.
+     * I think there is a bug in ConstraintLayout groups + visibility because sometimes it
+     * does not work. That is why I change visibility individually here, not using CL groups
+     */
+    private fun displayNoConnectionMessage() {
+        lineChart.visibility = View.INVISIBLE
+        btDay.visibility = View.INVISIBLE
+        btWeek.visibility = View.INVISIBLE
+        btYear.visibility = View.INVISIBLE
+        btRetry.visibility = View.VISIBLE
+        tvNoConnection.visibility = View.VISIBLE
+        progressBar.visibility = View.INVISIBLE
+    }
+
+    /**
+     * Hide "No Connection" UI and show the chart and timespan buttons.
+     * I think there is a bug in ConstraintLayout groups + visibility because sometimes it
+     * does not work. That is why I change visibility individually here, not using CL groups
+     */
+    private fun displayMainContent() {
+        lineChart.visibility = View.VISIBLE
+        btDay.visibility = View.VISIBLE
+        btWeek.visibility = View.VISIBLE
+        btYear.visibility = View.VISIBLE
+        btRetry.visibility = View.INVISIBLE
+        tvNoConnection.visibility = View.INVISIBLE
+    }
+
+    private fun Button.unselect() {
+        this.setTextColor(getColorFromAttr(R.attr.unselectedButtonText))
+    }
+
+    private fun Button.select() {
+        this.setTextColor(getColorFromAttr(R.attr.selectedButtonText))
     }
 
     companion object {
@@ -145,5 +182,8 @@ class MainActivity : AppCompatActivity() {
         const val MONTH_IN_SECONDS = 2628000f
         const val ANIM_DURATION = 1000
         const val SEC_TO_MILLIS = 1000
+        const val YEAR_FORMAT = "MMM YYYY"
+        const val WEEK_FORMAT = "MMM dd"
+        const val DAY_FORMAT = "HH:mm"
     }
 }
