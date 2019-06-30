@@ -2,7 +2,7 @@ package com.angelinaandronova.bitcoinexchangerates.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.angelinaandronova.bitcoinexchangerates.MainViewModel
+import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainViewModel
 import dagger.Binds
 import dagger.MapKey
 import dagger.Module

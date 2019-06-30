@@ -1,4 +1,4 @@
-package com.angelinaandronova.bitcoinexchangerates
+package com.angelinaandronova.bitcoinexchangerates.mainScreen
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -10,10 +10,13 @@ import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 
-class MainViewModel @Inject constructor(private val appContext: Context, val repo: MainRepository) : ViewModel() {
+class MainViewModel @Inject constructor(
+    private val appContext: Context,
+    private val repo: MainRepository
+) : ViewModel() {
 
     val screenState = MutableLiveData<ScreenState>()
-    lateinit var disposable: Disposable
+    private lateinit var disposable: Disposable
 
     init {
         tryToLoadData()
@@ -21,9 +24,11 @@ class MainViewModel @Inject constructor(private val appContext: Context, val rep
 
     fun tryToLoadData() {
         if (noInternetConnection()) {
-            screenState.value = ScreenState.NoConnection
+            screenState.value =
+                ScreenState.NoConnection
         } else {
-            screenState.value = ScreenState.Loading()
+            screenState.value =
+                ScreenState.Loading()
         }
     }
 
@@ -33,7 +38,8 @@ class MainViewModel @Inject constructor(private val appContext: Context, val rep
 
     fun loadData(timespan: TimeSpan) {
         if (noInternetConnection()) {
-            screenState.value = ScreenState.NoConnection
+            screenState.value =
+                ScreenState.NoConnection
             return
         }
 
@@ -48,11 +54,17 @@ class MainViewModel @Inject constructor(private val appContext: Context, val rep
     private fun displayEntries(response: BitcoinRatesResponse, timespan: TimeSpan) {
         val entries = arrayListOf<Entry>()
         response.values.forEach { entries.add(Entry(it.x, it.y)) }
-        screenState.value = ScreenState.DisplayData(Pair(timespan, entries))
+        screenState.value = ScreenState.DisplayData(
+            Pair(
+                timespan,
+                entries
+            )
+        )
     }
 
     private fun handleError(throwable: Throwable) {
-        screenState.value = ScreenState.NetworkError(throwable.localizedMessage)
+        screenState.value =
+            ScreenState.NetworkError(throwable.localizedMessage)
     }
 
     override fun onCleared() {

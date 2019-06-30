@@ -1,6 +1,6 @@
 package com.angelinaandronova.bitcoinexchangerates.di
 
-import com.angelinaandronova.bitcoinexchangerates.ui.MainActivity
+import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 

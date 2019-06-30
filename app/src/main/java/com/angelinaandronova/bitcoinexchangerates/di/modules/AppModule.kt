@@ -1,4 +1,4 @@
-package com.angelinaandronova.bitcoinexchangerates.di
+package com.angelinaandronova.bitcoinexchangerates.di.modules
 
 import android.content.Context
 import com.angelinaandronova.bitcoinexchangerates.BitcoinApp

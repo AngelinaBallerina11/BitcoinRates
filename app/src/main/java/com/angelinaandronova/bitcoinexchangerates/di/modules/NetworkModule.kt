@@ -1,4 +1,4 @@
-package com.angelinaandronova.bitcoinexchangerates.di
+package com.angelinaandronova.bitcoinexchangerates.di.modules
 
 import com.angelinaandronova.bitcoinexchangerates.nework.BitcoinRatesService
 import dagger.Module

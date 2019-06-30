@@ -1,4 +1,4 @@
-package com.angelinaandronova.bitcoinexchangerates.ui
+package com.angelinaandronova.bitcoinexchangerates.mainScreen
 
 import android.os.Bundle
 import android.util.Log
@@ -8,10 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.angelinaandronova.bitcoinexchangerates.*
-import com.angelinaandronova.bitcoinexchangerates.MainViewModel.ScreenState.*
-import com.angelinaandronova.bitcoinexchangerates.MainViewModel.TimeSpan.*
+import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainViewModel.ScreenState.*
+import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainViewModel.TimeSpan.*
 import com.angelinaandronova.bitcoinexchangerates.chartUi.BitcoinMarkerView
 import com.angelinaandronova.bitcoinexchangerates.di.ViewModelFactory
+import com.angelinaandronova.bitcoinexchangerates.utils.getColorFromAttr
+import com.angelinaandronova.bitcoinexchangerates.utils.hide
+import com.angelinaandronova.bitcoinexchangerates.utils.show
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.Entry

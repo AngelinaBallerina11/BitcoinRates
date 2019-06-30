@@ -1,4 +1,4 @@
-package com.angelinaandronova.bitcoinexchangerates
+package com.angelinaandronova.bitcoinexchangerates.utils
 
 import android.content.Context
 import android.util.TypedValue
