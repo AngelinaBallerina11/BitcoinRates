@@ -1,6 +1,7 @@
-package com.angelinaandronova.bitcoinexchangerates
+package com.angelinaandronova.bitcoinexchangerates.nework
 
 import com.angelinaandronova.bitcoinexchangerates.model.BitcoinRatesResponse
+import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -12,7 +13,7 @@ interface BitcoinRatesService {
         @Query(FORMAT) format: String = DEFAULT_FORMAT,
         @Query(TIMESPAN) timespan: String = DEFAULT_TIMESPAN,
         @Query(ROLLING_AVERAGE) rollingAverage: String = DEFAULT_ROLLING_AVERAGE
-    ): Call<BitcoinRatesResponse>
+    ): Single<BitcoinRatesResponse>
 
     companion object {
         const val FORMAT = "format"

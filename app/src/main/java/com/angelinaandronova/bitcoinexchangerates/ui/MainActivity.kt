@@ -1,4 +1,4 @@
-package com.angelinaandronova.bitcoinexchangerates
+package com.angelinaandronova.bitcoinexchangerates.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -7,32 +7,42 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.angelinaandronova.bitcoinexchangerates.MainViewModel
 import com.angelinaandronova.bitcoinexchangerates.MainViewModel.ScreenState.*
 import com.angelinaandronova.bitcoinexchangerates.MainViewModel.TimeSpan.*
+import com.angelinaandronova.bitcoinexchangerates.R
 import com.angelinaandronova.bitcoinexchangerates.chartUi.BitcoinMarkerView
+import com.angelinaandronova.bitcoinexchangerates.di.ViewModelFactory
+import com.angelinaandronova.bitcoinexchangerates.getColorFromAttr
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
+import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
+import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var viewModel: MainViewModel
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidInjection.inject(this)
         setContentView(R.layout.activity_main)
         pushProgress()
 
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        viewModel.screenState.observe(this, Observer {
+        mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainViewModel::class.java)
+        mainViewModel.screenState.observe(this, Observer {
             when (it) {
                 is NoConnection -> {
                     displayNoConnectionMessage()
@@ -40,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 is Loading -> {
                     pushProgress()
-                    viewModel.loadData(it.timespan)
+                    mainViewModel.loadData(it.timespan)
                     Log.i("ANGELINA1234", "loading")
                 }
                 is DisplayData -> {
@@ -53,10 +63,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        btDay.setOnClickListener { viewModel.screenState.value = Loading(DAY) }
-        btWeek.setOnClickListener { viewModel.screenState.value = Loading(WEEK) }
-        btYear.setOnClickListener { viewModel.screenState.value = Loading(YEAR) }
-        btRetry.setOnClickListener { viewModel.tryToLoadData() }
+        btDay.setOnClickListener { mainViewModel.screenState.value = Loading(DAY) }
+        btWeek.setOnClickListener { mainViewModel.screenState.value = Loading(WEEK) }
+        btYear.setOnClickListener { mainViewModel.screenState.value = Loading(YEAR) }
+        btRetry.setOnClickListener { mainViewModel.tryToLoadData() }
     }
 
     private fun setUpButtons(timeSpan: MainViewModel.TimeSpan) {
@@ -115,11 +125,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun formatForDay(value: Float) = getFormatter(value, DAY_FORMAT)
+    private fun formatForDay(value: Float) = getFormatter(
+        value,
+        DAY_FORMAT
+    )
 
-    private fun formatForWeek(value: Float) = getFormatter(value, WEEK_FORMAT)
+    private fun formatForWeek(value: Float) = getFormatter(
+        value,
+        WEEK_FORMAT
+    )
 
-    private fun formatForYear(value: Float) = getFormatter(value, YEAR_FORMAT)
+    private fun formatForYear(value: Float) = getFormatter(
+        value,
+        YEAR_FORMAT
+    )
 
     private fun getFormatter(value: Float, pattern: String = WEEK_FORMAT) = DateTimeFormat.forPattern(pattern).run {
         print(DateTime(value.toLong() * SEC_TO_MILLIS, DateTimeZone.UTC))

@@ -1,16 +1,14 @@
 package com.angelinaandronova.bitcoinexchangerates
 
-import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.github.mikephil.charting.data.Entry
-import kotlinx.coroutines.*
+import javax.inject.Inject
 
 
-class MainViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope by MainScope() {
+class MainViewModel @Inject constructor(private val appContext: Context, val repo: MainRepository) : ViewModel() {
 
     val screenState = MutableLiveData<ScreenState>()
 
@@ -27,7 +25,7 @@ class MainViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     }
 
     private fun noInternetConnection(): Boolean =
-        (app.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager)
+        (appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager)
             ?.activeNetworkInfo?.isConnected != true
 
     fun loadData(timespan: TimeSpan) {
@@ -35,17 +33,17 @@ class MainViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
             screenState.value = ScreenState.NoConnection
             return
         }
-        launch {
-            val service = RetrofitClientInstance.getRetrofitInstance().create(BitcoinRatesService::class.java)
-            val call = service.getRatesForChart(timespan = timespan.queryParam)
 
-            val response = withContext(Dispatchers.IO) { call.execute() }
-            Log.i("ANGELINA1234", "${response.body()}")
+        /* val service = RetrofitClientInstance.getRetrofitInstance().create(BitcoinRatesService::class.java)
+         val call = service.getRatesForChart(timespan = timespan.queryParam)
 
-            val entries = arrayListOf<Entry>()
-            response.body()?.values?.forEach { entries.add(Entry(it.x, it.y)) }
-            screenState.value = ScreenState.DisplayData(Pair(timespan, entries))
-        }
+         val response = withContext(Dispatchers.IO) { call.execute() }
+         Log.i("ANGELINA1234", "${response.body()}")
+
+         val entries = arrayListOf<Entry>()
+         response.body()?.values?.forEach { entries.add(Entry(it.x, it.y)) }
+         screenState.value = ScreenState.DisplayData(Pair(timespan, entries))*/
+
     }
 
     enum class TimeSpan(val queryParam: String) {
