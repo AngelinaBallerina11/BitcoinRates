@@ -1,8 +1,7 @@
 package com.angelinaandronova.bitcoinexchangerates.nework
 
-import com.angelinaandronova.bitcoinexchangerates.model.BitcoinRatesResponse
+import com.angelinaandronova.bitcoinexchangerates.nework.model.BitcoinRatesResponse
 import io.reactivex.Single
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 

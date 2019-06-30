@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.angelinaandronova.bitcoinexchangerates.model.BitcoinRatesResponse
+import com.angelinaandronova.bitcoinexchangerates.nework.model.BitcoinRatesResponse
 import com.github.mikephil.charting.data.Entry
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
@@ -74,8 +74,8 @@ class MainViewModel @Inject constructor(
 
     enum class TimeSpan(val queryParam: String) {
         DAY("1days"),
-        WEEK("1week"),
-        YEAR("1year")
+        WEEK("1weeks"),
+        YEAR("1years")
     }
 
     sealed class ScreenState {

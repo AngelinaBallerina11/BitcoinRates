@@ -1,4 +1,4 @@
-package com.angelinaandronova.bitcoinexchangerates.model
+package com.angelinaandronova.bitcoinexchangerates.nework.model
 
 /**
  * Data class representing a point on a line chart

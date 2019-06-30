@@ -1,4 +1,4 @@
-package com.angelinaandronova.bitcoinexchangerates.model
+package com.angelinaandronova.bitcoinexchangerates.nework.model
 
 
 data class BitcoinRatesResponse(
