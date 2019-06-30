@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                     YEAR -> MONTH_IN_SECONDS
                 }
             }
-            markerView = BitcoinMarkerView(context, R.layout.chart_marker_view)
+            marker = BitcoinMarkerView(context, R.layout.chart_marker_view)
             animateX(ANIM_DURATION, Easing.EaseInCubic)
             description.isEnabled = false
             setDrawMarkers(true)
