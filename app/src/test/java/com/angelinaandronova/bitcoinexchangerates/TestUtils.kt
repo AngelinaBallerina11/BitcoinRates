@@ -1,10 +1,10 @@
 package com.angelinaandronova.bitcoinexchangerates
 
+import androidx.lifecycle.LiveData
 import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainViewModel
 import com.angelinaandronova.bitcoinexchangerates.nework.model.BitcoinRatesResponse
 import com.angelinaandronova.bitcoinexchangerates.nework.model.Point
-import org.mockito.ArgumentMatchers.anyFloat
-import org.mockito.ArgumentMatchers.anyString
+import io.reactivex.observers.TestObserver
 import kotlin.random.Random
 
 object TestUtils {
@@ -25,3 +25,5 @@ object TestUtils {
     fun getRandomTimespan() = MainViewModel.TimeSpan.values()[Random.nextInt(2)]
 
 }
+
+fun <T> LiveData<T>.test(): TestObserver<T> = TestObserver.create()

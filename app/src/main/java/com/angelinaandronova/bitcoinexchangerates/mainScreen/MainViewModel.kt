@@ -1,17 +1,16 @@
 package com.angelinaandronova.bitcoinexchangerates.mainScreen
 
-import android.content.Context
-import android.net.ConnectivityManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.angelinaandronova.bitcoinexchangerates.nework.model.BitcoinRatesResponse
 import com.github.mikephil.charting.data.Entry
 import io.reactivex.disposables.Disposable
+import java.io.IOException
 import javax.inject.Inject
 
 
 class MainViewModel @Inject constructor(
-    private val appContext: Context,
+    private val connection: Connection,
     private val repo: MainRepository
 ) : ViewModel() {
 
@@ -23,21 +22,15 @@ class MainViewModel @Inject constructor(
     }
 
     fun tryToLoadData() {
-        if (noInternetConnection()) {
-            screenState.value =
-                ScreenState.NoConnection
+        if (connection.isOffline()) {
+            screenState.value = ScreenState.NoConnection
         } else {
-            screenState.value =
-                ScreenState.Loading()
+            screenState.value = ScreenState.Loading()
         }
     }
 
-    private fun noInternetConnection(): Boolean =
-        (appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager)
-            ?.activeNetworkInfo?.isConnected != true
-
     fun loadData(timespan: TimeSpan) {
-        if (noInternetConnection()) {
+        if (connection.isOffline()) {
             screenState.value =
                 ScreenState.NoConnection
             return
@@ -83,5 +76,19 @@ class MainViewModel @Inject constructor(
         data class Loading(val timespan: TimeSpan = TimeSpan.WEEK) : ScreenState()
         data class DisplayData(val chartEntries: Pair<TimeSpan, ArrayList<Entry>>) : ScreenState()
         data class NetworkError(val message: String) : ScreenState()
+    }
+}
+
+class Connection @Inject constructor() {
+    fun isOffline(): Boolean {
+        try {
+            val ipProcess = Runtime.getRuntime().exec("/system/bin/ping -c 1 8.8.8.8")
+            return ipProcess.waitFor() != 0
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
+        return true
     }
 }
