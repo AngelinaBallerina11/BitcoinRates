@@ -10,11 +10,13 @@ import javax.inject.Inject
 
 class MainRepositoryImpl @Inject constructor(val service: BitcoinRatesService) : MainRepository {
 
-    fun retrieveData(timeSpan: MainViewModel.TimeSpan): Single<BitcoinRatesResponse> =
+    override fun retrieveData(timeSpan: MainViewModel.TimeSpan): Single<BitcoinRatesResponse> =
         service.getRatesForChart(timespan = timeSpan.queryParam)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
 }
 
-interface MainRepository
+interface MainRepository {
+    fun retrieveData(timeSpan: MainViewModel.TimeSpan): Single<BitcoinRatesResponse>
+}

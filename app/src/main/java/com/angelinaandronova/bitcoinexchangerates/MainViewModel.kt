@@ -4,13 +4,16 @@ import android.content.Context
 import android.net.ConnectivityManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.angelinaandronova.bitcoinexchangerates.model.BitcoinRatesResponse
 import com.github.mikephil.charting.data.Entry
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 
 class MainViewModel @Inject constructor(private val appContext: Context, val repo: MainRepository) : ViewModel() {
 
     val screenState = MutableLiveData<ScreenState>()
+    lateinit var disposable: Disposable
 
     init {
         tryToLoadData()
@@ -34,16 +37,27 @@ class MainViewModel @Inject constructor(private val appContext: Context, val rep
             return
         }
 
-        /* val service = RetrofitClientInstance.getRetrofitInstance().create(BitcoinRatesService::class.java)
-         val call = service.getRatesForChart(timespan = timespan.queryParam)
+        disposable = repo.retrieveData(timespan)
+            .subscribe(
+                { response -> displayEntries(response, timespan) },
+                ::handleError
+            )
 
-         val response = withContext(Dispatchers.IO) { call.execute() }
-         Log.i("ANGELINA1234", "${response.body()}")
+    }
 
-         val entries = arrayListOf<Entry>()
-         response.body()?.values?.forEach { entries.add(Entry(it.x, it.y)) }
-         screenState.value = ScreenState.DisplayData(Pair(timespan, entries))*/
+    private fun displayEntries(response: BitcoinRatesResponse, timespan: TimeSpan) {
+        val entries = arrayListOf<Entry>()
+        response.values.forEach { entries.add(Entry(it.x, it.y)) }
+        screenState.value = ScreenState.DisplayData(Pair(timespan, entries))
+    }
 
+    private fun handleError(throwable: Throwable) {
+        screenState.value = ScreenState.NetworkError(throwable.localizedMessage)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        disposable.dispose()
     }
 
     enum class TimeSpan(val queryParam: String) {
@@ -56,6 +70,6 @@ class MainViewModel @Inject constructor(private val appContext: Context, val rep
         object NoConnection : ScreenState()
         data class Loading(val timespan: TimeSpan = TimeSpan.WEEK) : ScreenState()
         data class DisplayData(val chartEntries: Pair<TimeSpan, ArrayList<Entry>>) : ScreenState()
-        // TODO: error state
+        data class NetworkError(val message: String) : ScreenState()
     }
 }

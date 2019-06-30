@@ -2,18 +2,16 @@ package com.angelinaandronova.bitcoinexchangerates.ui
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.angelinaandronova.bitcoinexchangerates.MainViewModel
+import com.angelinaandronova.bitcoinexchangerates.*
 import com.angelinaandronova.bitcoinexchangerates.MainViewModel.ScreenState.*
 import com.angelinaandronova.bitcoinexchangerates.MainViewModel.TimeSpan.*
-import com.angelinaandronova.bitcoinexchangerates.R
 import com.angelinaandronova.bitcoinexchangerates.chartUi.BitcoinMarkerView
 import com.angelinaandronova.bitcoinexchangerates.di.ViewModelFactory
-import com.angelinaandronova.bitcoinexchangerates.getColorFromAttr
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.Entry
@@ -54,12 +52,12 @@ class MainActivity : AppCompatActivity() {
                     Log.i("ANGELINA1234", "loading")
                 }
                 is DisplayData -> {
-                    popProgress()
                     displayMainContent()
                     Log.i("ANGELINA1234", "display data")
                     setUpChart(it.chartEntries)
                     setUpButtons(it.chartEntries.first)
                 }
+                is NetworkError -> showToast(it.message)
             }
         })
 
@@ -67,6 +65,10 @@ class MainActivity : AppCompatActivity() {
         btWeek.setOnClickListener { mainViewModel.screenState.value = Loading(WEEK) }
         btYear.setOnClickListener { mainViewModel.screenState.value = Loading(YEAR) }
         btRetry.setOnClickListener { mainViewModel.tryToLoadData() }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun setUpButtons(timeSpan: MainViewModel.TimeSpan) {
@@ -90,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpChart(chartEntries: Pair<MainViewModel.TimeSpan, ArrayList<Entry>>) {
-        val dataSet = LineDataSet(chartEntries.second, "Bitcoin exchange rates").apply {
+        val dataSet = LineDataSet(chartEntries.second, CHART_LABEL).apply {
             color = getColorFromAttr(R.attr.chartLineColor)
             setDrawCircles(false)
             mode = LineDataSet.Mode.CUBIC_BEZIER
@@ -125,52 +127,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun formatForDay(value: Float) = getFormatter(
-        value,
-        DAY_FORMAT
-    )
+    private fun formatForDay(value: Float) = getFormatter(value, DAY_FORMAT)
 
-    private fun formatForWeek(value: Float) = getFormatter(
-        value,
-        WEEK_FORMAT
-    )
+    private fun formatForWeek(value: Float) = getFormatter(value, WEEK_FORMAT)
 
-    private fun formatForYear(value: Float) = getFormatter(
-        value,
-        YEAR_FORMAT
-    )
+    private fun formatForYear(value: Float) = getFormatter(value, YEAR_FORMAT)
 
     private fun getFormatter(value: Float, pattern: String = WEEK_FORMAT) = DateTimeFormat.forPattern(pattern).run {
         print(DateTime(value.toLong() * SEC_TO_MILLIS, DateTimeZone.UTC))
     }
 
+    /**
+     * Show progress bar
+     */
     private fun pushProgress() {
-        mainContent.visibility = View.INVISIBLE
-        progressBar.visibility = View.VISIBLE
-        btRetry.visibility = View.INVISIBLE
-        tvNoConnection.visibility = View.INVISIBLE
-    }
-
-    private fun popProgress() {
-        mainContent.visibility = View.VISIBLE
-        progressBar.visibility = View.INVISIBLE
-        btRetry.visibility = View.INVISIBLE
-        tvNoConnection.visibility = View.INVISIBLE
+        progressBar.show()
+        mainContent.hide()
+        btRetry.hide()
+        tvNoConnection.hide()
     }
 
     /**
-     * Show "No Connection" UI and hide the chart, timespan buttons & progress bar.
+     * Show "No Connection" UI and hide the chart, time span buttons & progress bar.
      * I think there is a bug in ConstraintLayout groups + visibility because sometimes it
      * does not work. That is why I change visibility individually here, not using CL groups
      */
     private fun displayNoConnectionMessage() {
-        lineChart.visibility = View.INVISIBLE
-        btDay.visibility = View.INVISIBLE
-        btWeek.visibility = View.INVISIBLE
-        btYear.visibility = View.INVISIBLE
-        btRetry.visibility = View.VISIBLE
-        tvNoConnection.visibility = View.VISIBLE
-        progressBar.visibility = View.INVISIBLE
+        btRetry.show()
+        tvNoConnection.show()
+        lineChart.hide()
+        btDay.hide()
+        btWeek.hide()
+        btYear.hide()
+        progressBar.hide()
     }
 
     /**
@@ -179,12 +168,14 @@ class MainActivity : AppCompatActivity() {
      * does not work. That is why I change visibility individually here, not using CL groups
      */
     private fun displayMainContent() {
-        lineChart.visibility = View.VISIBLE
-        btDay.visibility = View.VISIBLE
-        btWeek.visibility = View.VISIBLE
-        btYear.visibility = View.VISIBLE
-        btRetry.visibility = View.INVISIBLE
-        tvNoConnection.visibility = View.INVISIBLE
+        mainContent.show()
+        lineChart.show()
+        btDay.show()
+        btWeek.show()
+        btYear.show()
+        btRetry.hide()
+        tvNoConnection.hide()
+        progressBar.hide()
     }
 
     private fun Button.unselect() {
@@ -204,5 +195,6 @@ class MainActivity : AppCompatActivity() {
         const val YEAR_FORMAT = "MMM YYYY"
         const val WEEK_FORMAT = "MMM dd"
         const val DAY_FORMAT = "HH:mm"
+        const val CHART_LABEL = "Bitcoin exchange rates"
     }
 }
