@@ -13,9 +13,8 @@ class BitcoinApp : Application(), HasActivityInjector {
     @Inject
     lateinit var androidInjector: DispatchingAndroidInjector<Activity>
 
-    override fun activityInjector(): AndroidInjector<Activity> {
-        return androidInjector
-    }
+    override fun activityInjector(): AndroidInjector<Activity> = androidInjector
+
 
     override fun onCreate() {
         super.onCreate()

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_margin">8dp</dimen>
+    <dimen name="double_margin">16dp</dimen>
+    <dimen name="triple_margin">24dp</dimen>
+    <dimen name="chart_height">400dp</dimen>
+</resources>

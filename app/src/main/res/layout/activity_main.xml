@@ -9,14 +9,14 @@
 
     <com.github.mikephil.charting.charts.LineChart
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="@dimen/chart_height"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="@dimen/double_margin"
+            android:layout_marginEnd="@dimen/double_margin"
             android:id="@+id/lineChart"
             app:layout_constraintHorizontal_bias="0.0"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/triple_margin"
             app:layout_constraintTop_toBottomOf="@+id/btMonth"/>
 
     <com.google.android.material.button.MaterialButton
@@ -29,7 +29,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintEnd_toStartOf="@+id/btMonth"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="24dp"/>
+            android:layout_marginTop="@dimen/triple_margin"/>
 
     <com.google.android.material.button.MaterialButton
             android:text="@string/month"
@@ -59,21 +59,21 @@
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="@dimen/default_margin"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/default_margin"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/default_margin"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="@dimen/default_margin"/>
 
     <androidx.constraintlayout.widget.Group
             android:id="@+id/mainContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:constraint_referenced_ids="btMonth, btWeek, btYear, lineChart"/>
+            app:constraint_referenced_ids="btWeek,btMonth,btYear,lineChart"/>
 
     <TextView
             android:text="@string/you_are_not_connected_to_the_internet"
@@ -81,14 +81,14 @@
             android:layout_height="wrap_content"
             android:id="@+id/tvNoConnection"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="@dimen/default_margin"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/default_margin"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintBottom_toTopOf="@+id/btRetry"
             app:layout_constraintVertical_chainStyle="packed"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="@dimen/double_margin"/>
 
     <com.google.android.material.button.MaterialButton
             android:text="@string/retry"
@@ -96,12 +96,12 @@
             android:layout_height="wrap_content"
             android:id="@+id/btRetry"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="@dimen/default_margin"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="@dimen/default_margin"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/default_margin"
             app:layout_constraintTop_toBottomOf="@+id/tvNoConnection"
             app:layout_constraintHorizontal_bias="0.5"/>
 

@@ -29,16 +29,16 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun loadData(timespan: TimeSpan) {
+    fun loadData(timeSpan: TimeSpan) {
         if (connection.isOffline()) {
             screenState.value =
                 ScreenState.NoConnection
             return
         }
 
-        disposable = repo.retrieveData(timespan)
+        disposable = repo.retrieveData(timeSpan)
             .subscribe(
-                { response -> displayEntries(response, timespan) },
+                { response -> displayEntries(response, timeSpan) },
                 ::handleError
             )
 
