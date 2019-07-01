@@ -17,19 +17,7 @@
             android:id="@+id/lineChart"
             app:layout_constraintHorizontal_bias="0.0"
             android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@+id/btDay"/>
-
-    <com.google.android.material.button.MaterialButton
-            android:text="@string/day"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btDay"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintEnd_toStartOf="@+id/btWeek"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/btMonth"/>
 
     <com.google.android.material.button.MaterialButton
             android:text="@string/week"
@@ -37,11 +25,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btWeek"
-            app:layout_constraintStart_toEndOf="@+id/btDay"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintEnd_toStartOf="@+id/btMonth"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="24dp"/>
+
+    <com.google.android.material.button.MaterialButton
+            android:text="@string/month"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btMonth"
+            app:layout_constraintStart_toEndOf="@+id/btWeek"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintEnd_toStartOf="@+id/btYear"
-            app:layout_constraintBottom_toBottomOf="@+id/btDay"
-            app:layout_constraintTop_toTopOf="@+id/btDay"/>
+            app:layout_constraintBottom_toBottomOf="@+id/btWeek"
+            app:layout_constraintTop_toTopOf="@+id/btWeek"/>
 
     <com.google.android.material.button.MaterialButton
             android:text="@string/year"
@@ -49,11 +49,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btYear"
-            app:layout_constraintStart_toEndOf="@+id/btWeek"
+            app:layout_constraintStart_toEndOf="@+id/btMonth"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/btWeek"
-            app:layout_constraintTop_toTopOf="@+id/btWeek"/>
+            app:layout_constraintBottom_toBottomOf="@+id/btMonth"
+            app:layout_constraintTop_toTopOf="@+id/btMonth"/>
 
     <ProgressBar
             android:id="@+id/progressBar"
@@ -73,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:constraint_referenced_ids="btDay, btWeek, btYear, lineChart"/>
+            app:constraint_referenced_ids="btMonth, btWeek, btYear, lineChart"/>
 
     <TextView
             android:text="@string/you_are_not_connected_to_the_internet"

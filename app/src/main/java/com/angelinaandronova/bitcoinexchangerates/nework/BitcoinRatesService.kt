@@ -7,7 +7,7 @@ import retrofit2.http.Query
 
 interface BitcoinRatesService {
 
-    @GET(TRANSACTIONS_PER_SECOND_PATH)
+    @GET(MARKET_PRICE)
     fun getRatesForChart(
         @Query(FORMAT) format: String = DEFAULT_FORMAT,
         @Query(TIMESPAN) timespan: String = DEFAULT_TIMESPAN,
@@ -21,6 +21,6 @@ interface BitcoinRatesService {
         const val DEFAULT_TIMESPAN = "1weeks"
         const val ROLLING_AVERAGE = "rollingAverage"
         const val DEFAULT_ROLLING_AVERAGE = "8hours"
-        const val TRANSACTIONS_PER_SECOND_PATH = "/charts/transactions-per-second"
+        const val MARKET_PRICE = "/charts/market-price"
     }
 }

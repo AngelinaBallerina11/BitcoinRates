@@ -7,11 +7,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.angelinaandronova.bitcoinexchangerates.*
-import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainViewModel.ScreenState.*
-import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainViewModel.TimeSpan.*
+import com.angelinaandronova.bitcoinexchangerates.R
 import com.angelinaandronova.bitcoinexchangerates.chartUi.BitcoinMarkerView
 import com.angelinaandronova.bitcoinexchangerates.di.ViewModelFactory
+import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainViewModel.ScreenState.*
+import com.angelinaandronova.bitcoinexchangerates.mainScreen.MainViewModel.TimeSpan.*
 import com.angelinaandronova.bitcoinexchangerates.utils.getColorFromAttr
 import com.angelinaandronova.bitcoinexchangerates.utils.hide
 import com.angelinaandronova.bitcoinexchangerates.utils.show
@@ -64,8 +64,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        btDay.setOnClickListener { mainViewModel.screenState.value = Loading(DAY) }
         btWeek.setOnClickListener { mainViewModel.screenState.value = Loading(WEEK) }
+        btMonth.setOnClickListener { mainViewModel.screenState.value = Loading(MONTH) }
         btYear.setOnClickListener { mainViewModel.screenState.value = Loading(YEAR) }
         btRetry.setOnClickListener { mainViewModel.tryToLoadData() }
     }
@@ -76,26 +76,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpButtons(timeSpan: MainViewModel.TimeSpan) {
         when (timeSpan) {
-            DAY -> {
-                btDay.select()
-                btWeek.unselect()
-                btYear.unselect()
-            }
             WEEK -> {
                 btWeek.select()
-                btDay.unselect()
+                btMonth.unselect()
+                btYear.unselect()
+            }
+            MONTH -> {
+                btMonth.select()
+                btWeek.unselect()
                 btYear.unselect()
             }
             YEAR -> {
                 btYear.select()
                 btWeek.unselect()
-                btDay.unselect()
+                btMonth.unselect()
             }
         }
     }
 
     private fun setUpChart(chartEntries: Pair<MainViewModel.TimeSpan, ArrayList<Entry>>) {
-        val dataSet = LineDataSet(chartEntries.second, CHART_LABEL).apply {
+        val dataSet = LineDataSet(chartEntries.second, resources.getString(R.string.chart_label)).apply {
             color = getColorFromAttr(R.attr.chartLineColor)
             setDrawCircles(false)
             mode = LineDataSet.Mode.CUBIC_BEZIER
@@ -105,8 +105,8 @@ class MainActivity : AppCompatActivity() {
         val xAxisFormatter = object : ValueFormatter() {
             override fun getAxisLabel(value: Float, axis: AxisBase?): String =
                 when (chartEntries.first) {
-                    DAY -> formatForDay(value)
                     WEEK -> formatForWeek(value)
+                    MONTH -> formatForMonth(value)
                     YEAR -> formatForYear(value)
                 }
 
@@ -117,8 +117,7 @@ class MainActivity : AppCompatActivity() {
             xAxis.run {
                 valueFormatter = xAxisFormatter
                 granularity = when (chartEntries.first) {
-                    DAY -> HOUR_IN_SECONDS
-                    WEEK -> DAY_IN_SECONDS
+                    WEEK, MONTH -> DAY_IN_SECONDS
                     YEAR -> MONTH_IN_SECONDS
                 }
             }
@@ -130,15 +129,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun formatForDay(value: Float) = getFormatter(value, DAY_FORMAT)
+    private fun formatForMonth(value: Float) = getFormattedLabel(value, MONTH_FORMAT)
 
-    private fun formatForWeek(value: Float) = getFormatter(value, WEEK_FORMAT)
+    private fun formatForWeek(value: Float) = getFormattedLabel(value, WEEK_FORMAT)
 
-    private fun formatForYear(value: Float) = getFormatter(value, YEAR_FORMAT)
+    private fun formatForYear(value: Float) = getFormattedLabel(value, YEAR_FORMAT)
 
-    private fun getFormatter(value: Float, pattern: String = WEEK_FORMAT) = DateTimeFormat.forPattern(pattern).run {
-        print(DateTime(value.toLong() * SEC_TO_MILLIS, DateTimeZone.UTC))
-    }
+    private fun getFormattedLabel(value: Float, pattern: String = WEEK_FORMAT) =
+        DateTimeFormat.forPattern(pattern).run {
+            print(DateTime(value.toLong() * SEC_TO_MILLIS, DateTimeZone.UTC))
+        }
 
     /**
      * Show progress bar
@@ -159,8 +159,8 @@ class MainActivity : AppCompatActivity() {
         btRetry.show()
         tvNoConnection.show()
         lineChart.hide()
-        btDay.hide()
         btWeek.hide()
+        btMonth.hide()
         btYear.hide()
         progressBar.hide()
     }
@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
     private fun displayMainContent() {
         mainContent.show()
         lineChart.show()
-        btDay.show()
+        btMonth.show()
         btWeek.show()
         btYear.show()
         btRetry.hide()
@@ -191,13 +191,11 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val DAY_IN_SECONDS = 86400f
-        const val HOUR_IN_SECONDS = 3600f
         const val MONTH_IN_SECONDS = 2628000f
         const val ANIM_DURATION = 1000
         const val SEC_TO_MILLIS = 1000
         const val YEAR_FORMAT = "MMM YYYY"
         const val WEEK_FORMAT = "MMM dd"
-        const val DAY_FORMAT = "HH:mm"
-        const val CHART_LABEL = "Bitcoin exchange rates"
+        const val MONTH_FORMAT = "MMM dd"
     }
 }

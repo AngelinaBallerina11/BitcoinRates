@@ -66,8 +66,8 @@ class MainViewModel @Inject constructor(
     }
 
     enum class TimeSpan(val queryParam: String) {
-        DAY("1days"),
         WEEK("1weeks"),
+        MONTH("4weeks"),
         YEAR("1years")
     }
 
