@@ -1,11 +1,12 @@
 package com.angelinaandronova.bitcoinexchangerates.mainScreen
 
+import android.content.Context
+import android.net.ConnectivityManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.angelinaandronova.bitcoinexchangerates.nework.model.BitcoinRatesResponse
 import com.github.mikephil.charting.data.Entry
 import io.reactivex.disposables.Disposable
-import java.io.IOException
 import javax.inject.Inject
 
 
@@ -79,16 +80,10 @@ class MainViewModel @Inject constructor(
     }
 }
 
-class Connection @Inject constructor() {
+class Connection @Inject constructor(private val context: Context) {
     fun isOffline(): Boolean {
-        try {
-            val ipProcess = Runtime.getRuntime().exec("/system/bin/ping -c 1 8.8.8.8")
-            return ipProcess.waitFor() != 0
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-        }
-        return true
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetworkInfo
+        return !activeNetwork.isConnected
     }
 }

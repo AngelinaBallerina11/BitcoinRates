@@ -109,7 +109,6 @@ class MainActivity : AppCompatActivity() {
                     MONTH -> formatForMonth(value)
                     YEAR -> formatForYear(value)
                 }
-
         }
 
         with(lineChart) {
